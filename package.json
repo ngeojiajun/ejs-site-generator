@@ -1,5 +1,5 @@
 {
-  "name": "ejs-site-generator",
+  "name": "@ngeojiajun/ejs-site-generator",
   "version": "1.0.0",
   "description": "A simple tool that generate the HTML files based on the EJS template and the data.",
   "main": "index.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ngeojiajun/ejs-site-generator.git"
+    "url": "git://github.com/ngeojiajun/ejs-site-generator.git"
   },
   "author": "Jia Jun Ngeo",
   "license": "MIT",
