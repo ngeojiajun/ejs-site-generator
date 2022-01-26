@@ -4,7 +4,8 @@
   "description": "A simple tool that generate the HTML files based on the EJS template and the data.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "npm-publish":"npm publish --@ngeojiajun:registry=https://registry.npmjs.org --access public"
   },
   "repository": {
     "type": "git",
@@ -20,9 +21,6 @@
     "commander": "^8.3.0",
     "ejs": "^3.1.6",
     "glob": "^7.2.0"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
   },
   "bin": "./index.js"
 }
