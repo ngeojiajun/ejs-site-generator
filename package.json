@@ -1,6 +1,6 @@
 {
   "name": "@ngeojiajun/ejs-site-generator",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple tool that generate the HTML files based on the EJS template and the data.",
   "main": "index.js",
   "scripts": {
@@ -22,7 +22,7 @@
     "glob": "^7.2.0"
   },
   "publishConfig": {
-    "registry":"https://npm.pkg.github.com"
+    "registry": "https://npm.pkg.github.com"
   },
   "bin": "./index.js"
 }
