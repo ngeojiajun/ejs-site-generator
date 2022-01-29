@@ -36,6 +36,16 @@ const _paths={
   base:n=>path.join(options.Base,n),
   views:n=>path.join(options.Views,n)
 }
+function generateRuntimeDefaultVars(filename){
+  //replace the ending extension of the back with ""
+  filename=filename.replace(/\.(html|ejs|json)$/,"")
+  let unitName=lastElement(filename.replace("\\","/").split("/"));
+  return{
+    build_time:buildStart,
+    page_unit_name:unitName,
+    page_unit_path:filename
+  }
+}
 //
 // Parameter parsing
 //
@@ -71,6 +81,7 @@ else{
   console.error(`${options.Views} is not exists`);
   process.exit(-1);
 }
+const buildStart=new Date();
 //
 // EJS compile
 //
@@ -106,6 +117,7 @@ console.log(`Generating the page....`);
 let dataFiles=glob.sync("**/**/*.json",{cwd:options.Data});
 for(const filename of dataFiles){
   if(/(\.html\.json|\.ejs\.json)$/.test(filename))continue;
+  if(!(/\.(json)$/).test(filename))continue; //bug?
   console.log(`Compiling file ${filename}.....`);
   //load the json
   let json=JSON.parse(fs.readFileSync(`${path.join(options.Data,filename)}`,'utf8'));
@@ -125,8 +137,10 @@ for(const filename of dataFiles){
     console.error(`Cannot load the view named ${viewParam.view}`);
     process.exit(-1);
   }
+  //Predefine the server variables
+  let locals=generateRuntimeDefaultVars(filename);
   //load the variables from the default
-  let locals=JSON.parse(view.data);
+  deepAssignCopy(locals,JSON.parse(view.data));
   //then ovewrite those using the local data
   deepAssignCopy(locals,json);
   //then export the apis
@@ -139,6 +153,7 @@ for(const filename of dataFiles){
 //HTML/EJS files
 dataFiles=glob.sync("**/**/*[.ejs,.html]",{cwd:options.Data});
 for(const filename of dataFiles){
+  if(!(/\.(html|ejs)$/).test(filename))continue; //bug?
   console.log(`Compiling file ${filename}.....`);
   const finalPath=path.join(options.Out,filename.replace(/\.(html|ejs)$/,".html"));
   if(fs.existsSync(finalPath)){
@@ -165,8 +180,10 @@ for(const filename of dataFiles){
     console.error(`Cannot load the view named ${viewParam.view}`);
     process.exit(-1);
   }
+  //Predefine the server variables
+  let locals=generateRuntimeDefaultVars(filename);
   //load the variables from the default
-  let locals=JSON.parse(view.data);
+  deepAssignCopy(locals,JSON.parse(view.data));
   //then ovewrite those using the local data
   deepAssignCopy(locals,json);
   //then export the apis and the HTML/EJS files to include directly

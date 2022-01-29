@@ -23,6 +23,8 @@ Options:
 |`<name>.ejs`| The views for the file|
 |`<name>.ejs.json`|The default value assignments for the file|
 
+*Alert: If a view inherit another view, all key present in the parent json file must be also present in the view's json file or it will causes some `undefined` symbol errors. The json inheriting is work in progress*
+
 ### Directory structure of the data folder
 The engine accept two type of files:
 1. `.json` files which only contains the data file that the template require
@@ -38,4 +40,25 @@ The metadata required by the template could be provided through the `<filename>.
 |`_external._path.views(name)`|Return the resolved path for the path provided relative to the views directory|
 
 ## Special key in the JSON metadata
-To be added
+The `_viewParam` key allows the developer to specify the behavior of the compiler
+```js
+{
+  "_viewParam":{
+    "ignore": true|false,
+    "view":"default"
+  }
+}
+```
+|Name|Type|Description|
+|---|-----|-------|
+|`ignore`|All|The compiler should ignore this file from being processed|
+|`view`|Data pages only|The name of view that compiler will use while building the html for the data|
+
+## Runtime Variables
+This contain a list of the variables which will be defined by the engine if not defined by the page
+
+|Name|Description|
+|----|-----------|
+|`build_time`|The JavaScript `Date` Object which represent the timestamp that the build is started|
+|`page_unit_name`|The name of the page which usually taken from the filename|
+|`page_unit_path`|Similar with the `page_unit_name` but provided in full path|
