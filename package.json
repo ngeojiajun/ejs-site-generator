@@ -1,11 +1,11 @@
 {
   "name": "@ngeojiajun/ejs-site-generator",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A simple tool that generate the HTML files based on the EJS template and the data.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "npm-publish":"npm publish --@ngeojiajun:registry=https://registry.npmjs.org --access public"
+    "npm-publish": "npm publish --@ngeojiajun:registry=https://registry.npmjs.org --access public"
   },
   "repository": {
     "type": "git",
