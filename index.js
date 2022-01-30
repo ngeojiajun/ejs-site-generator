@@ -6,6 +6,7 @@ const process = require('process');
 const fs=require("fs");
 const glob = require("glob");
 const path=require("path");
+const parseIDTL=require("./idtl.js");
 //
 // Globals and typedefs
 //
@@ -45,6 +46,10 @@ function generateRuntimeDefaultVars(filename){
     page_unit_name:unitName,
     page_unit_path:filename
   }
+}
+function evalEJS(ctx /*provided from bind*/,str){
+  //eval the EJS from the variables
+  return ejs.render(str,ctx);
 }
 //
 // Parameter parsing
@@ -145,7 +150,8 @@ for(const filename of dataFiles){
   deepAssignCopy(locals,json);
   //then export the apis
   locals._external={
-    _path:_paths
+    _path:_paths,
+    evalEJS:evalEJS.bind(null,locals)
   }
   //finally generate the html
   fs.writeFileSync(path.join(options.Out,filename.replace(/\.json$/,".html")),view.view(locals));
@@ -189,7 +195,50 @@ for(const filename of dataFiles){
   //then export the apis and the HTML/EJS files to include directly
   locals._external={
     _path:_paths,
+    evalEJS:evalEJS.bind(null,locals),
     ejs_include:filename
+  }
+  //finally generate the html
+  fs.writeFileSync(finalPath,view.view(locals));
+}
+//IDTL file support
+dataFiles=glob.sync("**/**/*.idtl",{cwd:options.Data});
+for(const filename of dataFiles){
+  if(!(/\.idtl$/).test(filename))continue; //bug?
+  console.log(`Compiling file ${filename}.....`);
+  const finalPath=path.join(options.Out,filename.replace(/\.idtl$/,".html"));
+  if(fs.existsSync(finalPath)){
+    console.log(`Warning: the file ${finalPath} will be overwritten after this file has been compiled`);
+  }
+  //this file do not have its own metadata in separated it is inside the same file
+  //ask the engine to parse it
+  let json=parseIDTL(fs.readFileSync(`${path.join(options.Data,filename)}`,'utf8'));
+  let viewParam={}; //the view parameters
+  Object.assign(viewParam,defaults); //load the defaults
+  if(json._viewParam){
+    //if it is defined in the json copy it over and delete it
+    Object.assign(viewParam,json._viewParam);
+    delete json._viewParam;
+  }
+  //dont compile this file is the "ignore" is set to true in _viewParam
+  if(viewParam.ignore==true){
+    continue;
+  }
+  const view=Views[viewParam.view];
+  if(!view){
+    console.error(`Cannot load the view named ${viewParam.view}`);
+    process.exit(-1);
+  }
+  //Predefine the server variables
+  let locals=generateRuntimeDefaultVars(filename);
+  //load the variables from the default
+  deepAssignCopy(locals,JSON.parse(view.data));
+  //then ovewrite those using the local data
+  deepAssignCopy(locals,json);
+  //then export the apis and the HTML/EJS files to include directly
+  locals._external={
+    _path:_paths,
+    evalEJS:evalEJS.bind(null,locals)
   }
   //finally generate the html
   fs.writeFileSync(finalPath,view.view(locals));
