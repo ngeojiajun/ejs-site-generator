@@ -39,7 +39,7 @@ const _paths={
 }
 function generateRuntimeDefaultVars(filename){
   //replace the ending extension of the back with ""
-  filename=filename.replace(/\.(html|ejs|json)$/,"")
+  filename=filename.replace(/\.(html|ejs|json|idtl)$/,"")
   let unitName=lastElement(filename.replace("\\","/").split("/"));
   return{
     build_time:buildStart,
