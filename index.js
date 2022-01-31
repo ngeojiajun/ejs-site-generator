@@ -11,6 +11,7 @@ const parseIDTL=require("./idtl.js");
 // Globals and typedefs
 //
 let Views={};
+let Interops={};
 function View(view,data){
   this.view=view;
   this.data=data;
@@ -44,7 +45,8 @@ function generateRuntimeDefaultVars(filename){
   return{
     build_time:buildStart,
     page_unit_name:unitName,
-    page_unit_path:filename
+    page_unit_path:filename,
+    Interops:Interops
   }
 }
 function evalEJS(ctx /*provided from bind*/,str){
@@ -77,6 +79,14 @@ for(const key of Object.keys(options)){
   options[key]=path.resolve(options[key]);
 }
 console.log('Options: ', options);
+console.log("Loading interops.....");
+if(fs.existsSync("plugin.js")){
+  console.log("Found plugin.js.... Loading....");
+  Interops=require(path.join(options.Base,"plugin.js"));
+}
+else{
+  console.log("No plugin.js found... Skipping this step...")
+}
 console.log("Compiling the views....");
 console.log(`Changing directory to ${options.Views}`);
 if(fs.existsSync(options.Views)){

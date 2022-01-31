@@ -26,11 +26,12 @@ Options:
 *Alert: If a view inherit another view, all key present in the parent json file must be also present in the view's json file or it will causes some `undefined` symbol errors. The json inheriting is work in progress*
 
 ### Directory structure of the data folder
-The engine accept two type of files:
+The engine accept three type of files:
 1. `.json` files which only contains the data file that the template require
 2. `.ejs` or `.html` files which contain the html code to be directly included inside the template.
 This require the template to support it by include the file specified by the `_external.ejs_include` variable.
 The metadata required by the template could be provided through the `<filename>.json` under the same directory.
+3. `.idtl` files which have both html code and its metadata combined together. See [IDTL.md](IDTL.md) on the guideline on using it.
 
 ## API exported by the engine
 |Name|Description|
@@ -62,3 +63,4 @@ This contain a list of the variables which will be defined by the engine if not 
 |`build_time`|The JavaScript `Date` Object which represent the timestamp that the build is started|
 |`page_unit_name`|The name of the page which usually taken from the filename|
 |`page_unit_path`|Similar with the `page_unit_name` but provided in full path|
+|`Interops`|Handle to the imported copy of the `plugin.js` inside the build directory is it is found|
