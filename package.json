@@ -1,6 +1,6 @@
 {
   "name": "@ngeojiajun/ejs-site-generator",
-  "version": "1.0.4",
+  "version": "2.0.0",
   "description": "A simple tool that generate the HTML files based on the EJS template and the data.",
   "main": "index.js",
   "scripts": {
