@@ -1,6 +1,45 @@
 /*
 *This file contain the engine to parse the Inline Data Tagging Language based pages
 */
+function exists(obj,name){
+  return get(obj,name)!==undefined;
+}
+function assign(obj,name,value){
+  //resolve the name
+  let lastName="";
+  let orig=obj;
+  for(const k of name.split(".")){
+    orig=obj; //save the originals
+    lastName=k;
+    obj=obj[k];
+    if(obj===undefined){
+      obj={};
+      orig[k]=obj; //create if missing
+    }
+  }
+  //set the value using the last original handle it found
+  orig[lastName]=value;
+}
+function get(obj,name){
+  //resolve the name
+  for(const k of name.split(".")){
+    obj=obj[k];
+    if(obj===undefined){
+      return undefined;
+    }
+  }
+  return obj;
+}
+function push(obj,name,value){
+  //resolve the name
+  for(const k of name.split(".")){
+    obj=obj[k];
+    if(obj===undefined){
+      throw new Error("Cannot perform push on inexistant key");
+    }
+  }
+  obj.push(value);
+}
 function parseIDTL(str){
   const lines=str.split("\n");
   let ret={};
@@ -26,7 +65,7 @@ function parseIDTL(str){
           throw new Error(`IDTL parse error: unexpected [ARRAY_VALUE_END] at line ${i}`);
         }
         else if(content.trim().length>0){
-          ret[name].push(content); //push it
+          push(ret,name,content.trim()); //push it
           content="";
         }
         type="none"; // clear the type
@@ -36,7 +75,7 @@ function parseIDTL(str){
           throw new Error(`IDTL parse error: unexpected [PROP_VALUE_END] at line ${i}`);
         }
         else if(content.trim().length>0){
-          ret[name]=(content); //set it
+          assign(ret,name,content.trim()); //set it
           content="";
         }
         type="none"; // clear the type
@@ -45,8 +84,10 @@ function parseIDTL(str){
         //get the name
         name=line.slice(4).trim();
         //check is the operation is safe to do
-        ret[name]=ret[name]??[];
-        if(!Array.isArray(ret[name])){
+        if(!exists(ret,name)){
+          assign(ret,name,[]);
+        }
+        else if(!Array.isArray(get(ret,name))){
           throw new Error(`IDTL parse error: cannot append into the non array prop at line ${i}`);
         }
         type="array";
@@ -55,8 +96,8 @@ function parseIDTL(str){
         //get the name
         name=line.slice(3).trim();
         //check is the operation is safe to do
-        if(ret[name]!=undefined){
-          throw new Error(`IDTL parse error: variable already defined at line ${i}`);
+        if(exists(ret,name)){
+          throw new Error(`IDTL parse error: variable ${name} already defined at line ${i}`);
         }
         type="prop";
       }
