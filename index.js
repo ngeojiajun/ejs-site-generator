@@ -6,6 +6,7 @@ const process = require('process');
 const fs=require("fs");
 const glob = require("glob");
 const path=require("path");
+const fse = require('fs-extra');
 const parseIDTL=require("./idtl.js");
 //
 // Globals and typedefs
@@ -60,6 +61,7 @@ program.version('1.0.0');
 program.option("-views <dir>","The directory for the views","./views");
 program.option("-data <dir>","The directory for the data","./data");
 program.option("-out <dir>","The directory for the outputs","./out");
+program.option("-statics <dir>","The directory for the static files which will copied on the end of the build","./statics");
 program.option("-base <dir>","The base directory for the execution","./");
 program.parse();
 //
@@ -253,4 +255,7 @@ for(const filename of dataFiles){
   //finally generate the html
   fs.writeFileSync(finalPath,view.view(locals));
 }
+console.log("Copying the static files to the output....")
+// To copy a folder or file
+fse.copySync(options.Statics, options.Out,{overwrite:true});
 console.log("Done");

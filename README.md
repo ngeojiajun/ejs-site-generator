@@ -8,12 +8,13 @@ $ejs-site-generator -h
 Usage: index [options]
 
 Options:
-  -V, --version  output the version number
-  -views <dir>   The directory for the views (default: "./views")
-  -data <dir>    The directory for the data (default: "./data")
-  -out <dir>     The directory for the outputs (default: "./out")
-  -base <dir>    The base directory for the execution (default: "./")
-  -h, --help     display help for command
+  -V, --version   output the version number
+  -views <dir>    The directory for the views (default: "./views")
+  -data <dir>     The directory for the data (default: "./data")
+  -out <dir>      The directory for the outputs (default: "./out")
+  -statics <dir>  The directory for the static files which will copied on the end of the build (default: "./statics")
+  -base <dir>     The base directory for the execution (default: "./")
+  -h, --help      display help for command
 ```
 
 ### Directory structure of the view folder
