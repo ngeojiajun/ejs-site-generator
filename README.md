@@ -65,3 +65,14 @@ This contain a list of the variables which will be defined by the engine if not 
 |`page_unit_name`|The name of the page which usually taken from the filename|
 |`page_unit_path`|Similar with the `page_unit_name` but provided in full path|
 |`Interops`|Handle to the imported copy of the `plugin.js` inside the build directory is it is found|
+
+## Plugin support
+The generator supports custom plugin by placing a `plugin.js` on the base directory. Its exports will be imported as `Interops` from the template.
+### Build hooks
+Within the same file the developers can specify their build hooks to catch events.
+
+|Name|Description|
+|----|-----------|
+|`hooks.build_start()`|The build is begin|
+|`hooks.build_done()`|The build is finished|
+|`hooks.new_page(path)`|A new page has been generated|

@@ -57,7 +57,7 @@ function evalEJS(ctx /*provided from bind*/,str){
 //
 // Parameter parsing
 //
-program.version('1.0.0');
+program.version('4.0.0');
 program.option("-views <dir>","The directory for the views","./views");
 program.option("-data <dir>","The directory for the data","./data");
 program.option("-out <dir>","The directory for the outputs","./out");
@@ -89,6 +89,8 @@ if(fs.existsSync("plugin.js")){
 else{
   console.log("No plugin.js found... Skipping this step...")
 }
+console.log("Running build_start hook....");
+Interops.hooks?.build_start?.();
 console.log("Compiling the views....");
 console.log(`Changing directory to ${options.Views}`);
 if(fs.existsSync(options.Views)){
@@ -166,14 +168,17 @@ for(const filename of dataFiles){
     evalEJS:evalEJS.bind(null,locals)
   }
   //finally generate the html
-  fs.writeFileSync(path.join(options.Out,filename.replace(/\.json$/,".html")),view.view(locals));
+  const name=filename.replace(/\.json$/,".html");
+  fs.writeFileSync(path.join(options.Out,name),view.view(locals));
+  Interops.hooks?.new_page?.(name);
 }
 //HTML/EJS files
 dataFiles=glob.sync("**/**/*[.ejs,.html]",{cwd:options.Data});
 for(const filename of dataFiles){
   if(!(/\.(html|ejs)$/).test(filename))continue; //bug?
   console.log(`Compiling file ${filename}.....`);
-  const finalPath=path.join(options.Out,filename.replace(/\.(html|ejs)$/,".html"));
+  const finalName=filename.replace(/\.(html|ejs)$/,".html");
+  const finalPath=path.join(options.Out,finalName);
   if(fs.existsSync(finalPath)){
     console.log(`Warning: the file ${finalPath} will be overwritten after this file has been compiled`);
   }
@@ -212,13 +217,15 @@ for(const filename of dataFiles){
   }
   //finally generate the html
   fs.writeFileSync(finalPath,view.view(locals));
+  Interops.hooks?.new_page?.(finalName);
 }
 //IDTL file support
 dataFiles=glob.sync("**/**/*.idtl",{cwd:options.Data});
 for(const filename of dataFiles){
   if(!(/\.idtl$/).test(filename))continue; //bug?
   console.log(`Compiling file ${filename}.....`);
-  const finalPath=path.join(options.Out,filename.replace(/\.idtl$/,".html"));
+  const finalName=filename.replace(/\.idtl$/,".html");
+  const finalPath=path.join(options.Out,finalName);
   if(fs.existsSync(finalPath)){
     console.log(`Warning: the file ${finalPath} will be overwritten after this file has been compiled`);
   }
@@ -254,8 +261,11 @@ for(const filename of dataFiles){
   }
   //finally generate the html
   fs.writeFileSync(finalPath,view.view(locals));
+  Interops.hooks?.new_page?.(finalName);
 }
 console.log("Copying the static files to the output....")
 // To copy a folder or file
 fse.copySync(options.Statics, options.Out,{overwrite:true});
+console.log("Running build_done hook....");
+Interops.hooks?.build_done?.();
 console.log("Done");
