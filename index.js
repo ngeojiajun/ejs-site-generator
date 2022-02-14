@@ -57,7 +57,7 @@ function evalEJS(ctx /*provided from bind*/,str){
 //
 // Parameter parsing
 //
-program.version('4.0.0');
+program.version('5.0.0');
 program.option("-views <dir>","The directory for the views","./views");
 program.option("-data <dir>","The directory for the data","./data");
 program.option("-out <dir>","The directory for the outputs","./out");
@@ -267,5 +267,6 @@ console.log("Copying the static files to the output....")
 // To copy a folder or file
 fse.copySync(options.Statics, options.Out,{overwrite:true});
 console.log("Running build_done hook....");
+process.chdir(options.Base);
 Interops.hooks?.build_done?.();
 console.log("Done");
