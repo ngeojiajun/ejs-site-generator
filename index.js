@@ -57,7 +57,7 @@ function evalEJS(ctx /*provided from bind*/,str){
 //
 // Parameter parsing
 //
-program.version('5.0.0');
+program.version('5.1.0');
 program.option("-views <dir>","The directory for the views","./views");
 program.option("-data <dir>","The directory for the data","./data");
 program.option("-out <dir>","The directory for the outputs","./out");
@@ -263,10 +263,29 @@ for(const filename of dataFiles){
   fs.writeFileSync(finalPath,view.view(locals));
   Interops.hooks?.new_page?.(finalName);
 }
+//switch back to base because the JST build script assume they are inside the root
+process.chdir(options.Base);
+//JST file support
+dataFiles=glob.sync("**/**/*.jst",{cwd:options.Data});
+for(const filename of dataFiles){
+  if(!(/\.jst$/).test(filename))continue; //bug?
+  const finalName=filename.replace(/\.jst$/,".js");
+  console.log(`Generating file ${finalName}.....`);
+  const finalPath=path.join(options.Out,finalName);
+  if(fs.existsSync(finalPath)){
+    console.log(`Warning: the file ${finalPath} will be overwritten after this file has been compiled`);
+  }
+  //this file do not require runtime information except the interops
+  let view=ejs.compile(fs.readFileSync(path.join(options.Data,filename),'utf8'));
+  //finally generate the html
+  fs.writeFileSync(finalPath,view({
+    Interops:Interops
+  }));
+  Interops.hooks?.new_page?.(finalName);
+}
 console.log("Copying the static files to the output....")
 // To copy a folder or file
 fse.copySync(options.Statics, options.Out,{overwrite:true});
 console.log("Running build_done hook....");
-process.chdir(options.Base);
 Interops.hooks?.build_done?.();
 console.log("Done");
